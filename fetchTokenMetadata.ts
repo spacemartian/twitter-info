@@ -10,6 +10,9 @@ interface UserProfile {
     followers_count?: number;
     following_count?: number;
     tweet_count?: number;
+    date_joined?: string;
+    verified?: boolean;
+    verified_type?: string;
     error?: {
         message: string;
         details?: string;
@@ -83,6 +86,9 @@ class TokenMetadataAnalysis {
                 username: userData.username,
                 url: userData.url ?? "",
                 description: userData.description,
+                date_joined: userData.created_at,
+                verified: userData.verified,
+                verified_type: userData.verified_type,
                 followers_count: userData.public_metrics?.followers_count ?? 0,
                 following_count: userData.public_metrics?.following_count ?? 0,
                 tweet_count: userData.public_metrics?.tweet_count ?? 0
