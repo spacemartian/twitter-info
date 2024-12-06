@@ -158,10 +158,33 @@ class TokenMetadataAnalysis {
         } catch {
             finalUrl = `https://${url}`;
         }
+
+        const makeRequest = async (method: string) => {
+            try {
+                console.log(`Attempting ${method} request...`);
+                const response = await fetch(finalUrl, { method });
+                return response;
+            } catch (error) {
+                console.error(`${method} request failed:`, error);
+                return null;
+            }
+        };
     
         try {
-            console.log("Reading website ...")
-            const response = await fetch(finalUrl, { method: 'HEAD' });
+            // Attempt HEAD request first
+            let response = await makeRequest('HEAD');
+
+            // Fallback to GET if HEAD fails
+            if (!response || !response.ok) {
+                console.log("Falling back to GET request...");
+                response = await makeRequest('GET');
+            }
+
+            // If neither HEAD nor GET work
+            if (!response) {
+                throw new Error('Both HEAD and GET requests failed.');
+            }
+
             const urlObj = new URL(response.url);
             const hostnameWithoutWWW = urlObj.hostname.replace(/^www\./, '').toLowerCase();
             const isSocial = isSocialMedia(hostnameWithoutWWW);
