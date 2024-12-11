@@ -144,6 +144,27 @@ class TokenMetadataAnalysis {
     }
 
     /**
+     * Fetch trending topics
+     * @param woeid - The WOEID (Where On Earth IDentifier) (default is the United States).
+     * @returns Promise resolving to the trends data.
+     */
+    async fetchTrendingTopics(woeid: string = "23424977"): Promise<any> {
+        const url = `https://api.x.com/2/trends/by/woeid/${woeid}`;
+  
+        try {
+        const response = await axios.get(url, {
+            headers: {
+            Authorization: `Bearer ${this.#bearerToken}`,
+            },
+        });
+        return response.data;
+        } catch (error: any) {
+        console.error('Error fetching trends:', error.response?.data || error.message);
+        throw error;
+        }
+    }
+
+    /**
      * Verify a website by performing a HEAD request
      * @param url Website URL to verify
      * @returns Promise resolving to website verification result
