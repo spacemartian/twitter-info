@@ -42,6 +42,7 @@ interface Summary {
 
 class TokenMetadataAnalysis {
     #client;
+    #bearerToken;
     
     /**
      * Constructor that takes a bearer token and creates a read-only client
@@ -52,6 +53,7 @@ class TokenMetadataAnalysis {
         
         // Create a read-only client to restrict operations
         this.#client = client.readOnly;
+        this.#bearerToken = bearerToken;
     }
 
     /**
