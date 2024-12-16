@@ -1,5 +1,11 @@
 import { TwitterApi } from 'twitter-api-v2';
-import { isSocialMedia, isTokenAddressInText } from './utils';
+import { extractEd25519PublicKeys, isSocialMedia, isTokenAddressInText } from './utils';
+import axios from 'axios';
+
+interface Error {
+    message: string;
+    details?: string;
+}
 
 interface UserProfile {
     id?: string;
@@ -266,7 +272,8 @@ class TokenMetadataAnalysis {
             try {
                 const tweets = await this.searchTweets(username);
                 const tweetsText = tweets.map(tweet => tweet.text);
-                console.dir(tweetsText, { depth: null });
+                const extractedtokenAddress = extractEd25519PublicKeys(tweetsText)
+                console.dir(`Extracted Token Address: ${extractedtokenAddress}`, { depth: null });
             } catch (error) {
                 console.error('Polling error:', error);
             }
