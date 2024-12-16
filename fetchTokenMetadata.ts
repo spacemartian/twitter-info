@@ -228,6 +228,55 @@ class TokenMetadataAnalysis {
     }
 
     /**
+     * Searches for tweets from a specific Twitter username.
+     * 
+     * @param username - The Twitter username to search tweets for.
+     * @returns A Promise resolving to the search response containing tweets, or undefined in case of an error.
+     */
+    async searchTweets(username: string): Promise<Tweet[]> {
+        try {
+            const tweetsResponse =  await this.#client.v2.search(`from:${username}`, {'tweet.fields': ['created_at', 'text']});
+            return tweetsResponse.data.data?.map(tweet => ({
+                id: tweet.id,
+                text: tweet.text,
+                created_at: tweet.created_at!
+            })) || [];
+        } catch (error) {
+            console.error('Error fetching user tweets:', error);
+            throw new Error('Failed to fetch tweets');
+        }
+        
+    }
+
+
+    /**
+     * Polls tweets from a specific Twitter username at regular intervals.
+     * 
+     * @param username - The Twitter username to poll tweets for.
+     * @param interval - The polling interval in milliseconds (default is 5000ms).
+     * @returns A function to stop the polling process by clearing the interval.
+     * 
+     * @remarks
+     * This function periodically searches for tweets from the given username and logs the response.
+     * It returns a cleanup function to stop the polling when called.
+     * Any errors during polling are logged to the console.
+     */
+    async pollTweets(username: string, interval: number = 5000) {
+        const intervalId = setInterval(async () => {
+            try {
+                const tweets = await this.searchTweets(username);
+                const tweetsText = tweets.map(tweet => tweet.text);
+                console.dir(tweetsText, { depth: null });
+            } catch (error) {
+                console.error('Polling error:', error);
+            }
+            
+        }, interval);
+    
+        return () => clearInterval(intervalId);
+    }
+
+    /**
      * Generate a comprehensive summary of user metadata and token presence
      * @param username Twitter username
      * @param tokenAddress Token address to search for
